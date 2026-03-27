@@ -1,20 +1,30 @@
-// 検証用：eval() の危険な使用例
-// 危険な理由：外部から受け取った文字列を eval() で実行すると、
-//             任意のコードを実行される（リモートコード実行）リスクがある。
-// Snyk Code で「Code Injection」として検出されることを確認するためのサンプル。
+// 検証用：eval() の危険な使用例（修正済み）
+// 修正内容：eval() の代わりにホワイトリスト検証と事前定義コマンドマッピングを使用。
 
 'use strict';
 
-// NG例：ユーザー入力をそのまま eval() に渡す
+// 数値・演算子・スペースのみ許可するホワイトリスト検証
 function calculate(userInput) {
-  // 本来は安全な数式パーサーを使うべき
-  return eval(userInput);
+  if (typeof userInput !== 'string') {
+    throw new TypeError('入力は文字列である必要があります。');
+  }
+  if (!/^[0-9+\-*/(). ]+$/.test(userInput)) {
+    throw new Error('不正な入力です。数値と演算子のみ使用できます。');
+  }
+  // 本番では mathjs などのライブラリを使用すること
+  return Function('"use strict"; return (' + userInput.trim() + ')')();
 }
 
-// NG例：動的に関数を生成（eval と同様のリスク）
-function runDynamic(code) {
-  const fn = new Function('return ' + code);
-  return fn();
+// 事前定義されたコマンドのみ実行
+function runDynamic(command) {
+  const allowedCommands = {
+    hello: () => 'Hello, World!',
+    date: () => new Date().toISOString(),
+  };
+  if (!Object.prototype.hasOwnProperty.call(allowedCommands, command)) {
+    throw new Error('許可されていないコマンドです。');
+  }
+  return allowedCommands[command]();
 }
 
 module.exports = { calculate, runDynamic };

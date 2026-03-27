@@ -1,18 +1,18 @@
-// 検証用：ハードコードされたシークレット
-// 危険な理由：APIキーやパスワードをソースコードに直接書くと、
-//             リポジトリ公開時や git log から漏洩するリスクがある。
-// Snyk Code で「Hardcoded Secret」として検出されることを確認するためのサンプル。
+// 検証用：ハードコードされたシークレット（修正済み）
+// 修正内容：APIキー等の機密情報を環境変数から取得するように変更。
 
 'use strict';
 
-// NG例：APIキーをハードコード（本来は環境変数から取得すべき）
-const API_KEY = 'AKIAIOSFODNN7EXAMPLE1234567890abcdef';
-const DB_PASSWORD = 'P@ssw0rd!SuperSecret123';
-const JWT_SECRET = 'my-super-secret-jwt-key-do-not-share';
+const API_KEY = process.env.API_KEY;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 function connectToService() {
-  console.log('Connecting with API key:', API_KEY);
-  return { apiKey: API_KEY, password: DB_PASSWORD };
+  if (!API_KEY || !DB_PASSWORD) {
+    throw new Error('必要な環境変数が設定されていません。');
+  }
+  console.log('Connecting to service...');
+  return { connected: true };
 }
 
 module.exports = { connectToService };
