@@ -1,0 +1,12 @@
+{
+  "name": "snyk-verification-sample",
+  "version": "1.0.0",
+  "description": "検証用：Snyk の動作検証専用サンプル。本番利用禁止。",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "keywords": ["snyk", "verification", "sample"],
+  "license": "UNLICENSED",
+  "private": true
+}
