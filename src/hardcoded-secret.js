@@ -1,18 +1,26 @@
-// 検証用：ハードコードされたシークレット（修正済み）
-// 修正内容：APIキー等の機密情報を環境変数から取得するように変更。
+// 検証用：ハードコードされたシークレット
+// このファイルは Snyk Code の検出検証専用です。本番利用禁止。
+// 危険な理由：APIキー・パスワード・JWTシークレットをソースコードに直接埋め込んでいるため、
+// リポジトリへのアクセス権があれば誰でも機密情報を取得できる。
 
 'use strict';
 
-const API_KEY = process.env.API_KEY;
-const DB_PASSWORD = process.env.DB_PASSWORD;
-const JWT_SECRET = process.env.JWT_SECRET;
+// ❌ 危険：シークレットをハードコード
+const API_KEY = 'sk-1234567890abcdef1234567890abcdef';
+const DB_PASSWORD = 'SuperSecret@Password123!';
+const JWT_SECRET = 'my_jwt_secret_key_do_not_share';
+const AWS_ACCESS_KEY = 'AKIAIOSFODNN7EXAMPLE';
+const AWS_SECRET_KEY = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
 
-function connectToService() {
-  if (!API_KEY || !DB_PASSWORD) {
-    throw new Error('必要な環境変数が設定されていません。');
-  }
-  console.log('Connecting to service...');
-  return { connected: true };
+function connectToDatabase() {
+  // ❌ 危険：接続文字列にパスワードを直書き
+  const connectionString = `postgresql://admin:${DB_PASSWORD}@localhost:5432/mydb`;
+  console.log('Connecting with:', connectionString);
+  return connectionString;
 }
 
-module.exports = { connectToService };
+function getAuthToken() {
+  return JWT_SECRET;
+}
+
+module.exports = { connectToDatabase, getAuthToken, API_KEY };

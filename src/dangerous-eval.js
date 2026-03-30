@@ -1,30 +1,25 @@
-// 検証用：eval() の危険な使用例（修正済み）
-// 修正内容：eval() の代わりにホワイトリスト検証と事前定義コマンドマッピングを使用。
+// 検証用：eval() の危険な使用例
+// このファイルは Snyk Code の検出検証専用です。本番利用禁止。
+// 危険な理由：ユーザー入力を eval() に渡すと、任意のコードが実行される（コードインジェクション）。
 
 'use strict';
 
-// 数値・演算子・スペースのみ許可するホワイトリスト検証
+// ❌ 危険：ユーザー入力を eval() に直接渡す
 function calculate(userInput) {
-  if (typeof userInput !== 'string') {
-    throw new TypeError('入力は文字列である必要があります。');
-  }
-  if (!/^[0-9+\-*/(). ]+$/.test(userInput)) {
-    throw new Error('不正な入力です。数値と演算子のみ使用できます。');
-  }
-  // 本番では mathjs などのライブラリを使用すること
-  return Function('"use strict"; return (' + userInput.trim() + ')')();
+  // 攻撃例: userInput = "require('child_process').execSync('rm -rf /')"
+  return eval(userInput);
 }
 
-// 事前定義されたコマンドのみ実行
+// ❌ 危険：動的コード実行
 function runDynamic(command) {
-  const allowedCommands = {
-    hello: () => 'Hello, World!',
-    date: () => new Date().toISOString(),
-  };
-  if (!Object.prototype.hasOwnProperty.call(allowedCommands, command)) {
-    throw new Error('許可されていないコマンドです。');
-  }
-  return allowedCommands[command]();
+  const code = 'console.log("Running: ' + command + '")';
+  eval(code);
 }
 
-module.exports = { calculate, runDynamic };
+// ❌ 危険：new Function() も eval と同様に危険
+function executeExpression(expr) {
+  const fn = new Function('return ' + expr);
+  return fn();
+}
+
+module.exports = { calculate, runDynamic, executeExpression };
