@@ -27,6 +27,10 @@
 | `src/dangerous-eval.js` | `eval()` による任意コード実行 | `calculate()`, `runDynamic()`, `executeExpression()` |
 | `src/xss-example.js` | XSS（クロスサイトスクリプティング） | `innerHTML` への直接代入、`document.write()` |
 | `src/sql-injection-example.js` | SQLインジェクション | SQL 文字列への直接連結 |
+| `src/path-traversal.js` | パストラバーサル | ユーザー入力をファイルパスに直接使用 |
+| `src/command-injection.js` | コマンドインジェクション | `exec()`/`execSync()` にユーザー入力を直接渡す |
+| `src/weak-crypto.js` | 脆弱な暗号化 | MD5/SHA1 パスワードハッシュ、`Math.random()` のセキュリティ用途使用 |
+| `src/insecure-deserialization.js` | 安全でないデシリアライズ | Prototype Pollution、`eval()` によるJSONパース |
 
 ---
 
@@ -67,6 +71,10 @@ PR の Checks タブで以下を確認：
 - [ ] `dangerous-eval.js` の eval 使用が検出される
 - [ ] `xss-example.js` の XSS が検出される
 - [ ] `sql-injection-example.js` の SQL インジェクションが検出される
+- [ ] `path-traversal.js` のパストラバーサルが検出される
+- [ ] `command-injection.js` のコマンドインジェクションが検出される
+- [ ] `weak-crypto.js` の脆弱な暗号化が検出される
+- [ ] `insecure-deserialization.js` の安全でないデシリアライズが検出される
 - [ ] 該当行にインラインコメントが付く
 
 ### ステップ 5：PR クローズ＆ブランチ削除
