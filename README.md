@@ -20,7 +20,7 @@
 |---|---|
 | 用途 | Snyk 連携動作検証のみ |
 | マージ禁止 | 本番・staging ブランチへのマージは禁止 |
-| 脆弱なコード | 別ブランチに意図的な脆弱コード・脆弱な依存関係を含む |
+| 脆弱なコード | **意図的に**脆弱なコード・脆弱な依存関係を含む |
 | 削除 | 検証完了後はブランチ・リポジトリを削除すること |
 
 ---
@@ -29,22 +29,34 @@
 
 ```
 .
-├── README.md            # このファイル
-├── VALIDATION_NOTES.md  # 検証手順・検出箇所の説明
-├── package.json         # Node.js プロジェクト定義
+├── README.md                     # このファイル
+├── VALIDATION_NOTES.md           # 検証手順・検出箇所の説明
+├── package.json                  # Node.js プロジェクト定義（脆弱な依存関係を含む）
 └── src/
-    └── app.js           # サンプルコード（初期：脆弱性なし）
+    ├── app.js                    # エントリーポイント
+    ├── hardcoded-secret.js       # ハードコードされたシークレット（Snyk Code 検証）
+    ├── dangerous-eval.js         # eval 使用（Snyk Code 検証）
+    ├── xss-example.js            # XSS（Snyk Code 検証）
+    └── sql-injection-example.js  # SQLインジェクション（Snyk Code 検証）
 ```
 
-脆弱性の検証は別ブランチにて以下を追加します：
+---
 
-```
-src/
-├── hardcoded-secret.js    # ハードコードされたシークレット（Snyk Code 検証）
-├── dangerous-eval.js      # eval 使用（Snyk Code 検証）
-├── xss-example.js         # XSS（Snyk Code 検証）
-└── sql-injection-example.js  # SQLインジェクション（Snyk Code 検証）
-```
+## 含まれる脆弱性（検証用）
+
+### Snyk Open Source
+| パッケージ | バージョン | CVE |
+|---|---|---|
+| `lodash` | 4.17.4 | CVE-2019-10744（Prototype Pollution）等 |
+| `express` | 4.17.1 | 複数の既知脆弱性 |
+
+### Snyk Code
+| ファイル | 脆弱性の種類 |
+|---|---|
+| `src/hardcoded-secret.js` | ハードコードされた認証情報 |
+| `src/dangerous-eval.js` | `eval()` による任意コード実行 |
+| `src/xss-example.js` | `innerHTML` を介した XSS |
+| `src/sql-injection-example.js` | SQL 文字列連結によるインジェクション |
 
 ---
 
